@@ -1,0 +1,7 @@
+{
+  "name": "Elysian Orb",
+  "description": "An AI-powered emotional wellness companion that visualizes your emotions through an interactive liquid orb. Record your thoughts, receive insights, and embark on a gamified journey of mental wealth.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
