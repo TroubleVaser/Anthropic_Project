@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { Emotion, emotionList } from '../types';
 
@@ -22,11 +23,12 @@ export const analyzeAudioForEmotion = async (audioBlob: Blob) => {
   const audioFile = new File([audioBlob], "audio.webm", { type: "audio/webm" });
   const audioPart = await fileToGenerativePart(audioFile);
 
-  const prompt = `You are an expert emotion analysis AI. Analyze the user's speech in the provided audio. 
-  First, provide a full, clean transcript of the entire recording. 
-  Second, identify the single most dominant emotion from the following list: ${emotionList.join(', ')}. 
-  Pay close attention to the semantic content of their words. For example, if they explicitly say they are happy, the emotion is joy, even if their tone is neutral. 
-  If no clear emotion is detected, classify it as 'default'. Return your response in a valid JSON object.`;
+  const prompt = `You are a professional transcriber and emotion analyst.
+  Task 1: Transcribe the user's speech in the provided audio exactly as spoken. Be verbatim. Do not summarize, do not rephrase, and do not interpret the meaning in the transcript. If they say "Umm, I am sad", write "Umm, I am sad".
+  Task 2: Identify the single most dominant emotion from this list: ${emotionList.join(', ')}.
+  Pay close attention to the semantic content. If they explicitly state an emotion, prioritize that.
+  If no clear emotion is detected, classify it as 'neutral'.
+  Return a valid JSON object.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -66,12 +68,11 @@ export const analyzeAudioChunkForEmotion = async (audioBlob: Blob, contextTransc
   const audioFile = new File([audioBlob], "audio.webm", { type: "audio/webm" });
   const audioPart = await fileToGenerativePart(audioFile);
 
-  const prompt = `You are an expert emotion analysis AI. The user is speaking, and this is the conversation so far: "${contextTranscript}".
-  Now, analyze this new short audio clip. 
-  First, transcribe what is said in the clip. 
-  Second, determine the dominant emotion of the clip, considering both the words spoken and the tone, but give more weight to the explicit meaning of the words. For example, if they say "I am happy" in a flat tone, the emotion is 'joy'.
-  Choose from this list: ${emotionList.join(', ')}. If no clear emotion is detected, respond with 'default'. 
-  Return a valid JSON object with 'transcript' and 'emotion' keys.`;
+  const prompt = `You are a professional transcriber. The user is speaking.
+  Previous Context: "${contextTranscript}"
+  Task 1: Transcribe the NEW audio clip exactly as spoken. Do NOT summarize. Write exactly what was said.
+  Task 2: Determine the dominant emotion of this clip from: ${emotionList.join(', ')}.
+  Return a valid JSON object with 'transcript' and 'emotion'.`;
 
   try {
     const response = await ai.models.generateContent({
